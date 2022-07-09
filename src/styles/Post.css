@@ -1,0 +1,25 @@
+.post {
+    display: flex;
+    padding: 15px;
+    border: 2px solid lightgray;
+    margin-top: 15px;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.post__content {
+}
+
+.post__btns {
+
+}
+
+.btn {
+    height: 30px;
+    width: 100px;
+    border-radius: 5px;
+    border: #e2e2e2 1px solid;
+    cursor: pointer;
+
+}
