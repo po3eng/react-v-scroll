@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import classes from "./VirtualScroll.module.css";
-import Item from "../Item/Item";
 
-const VirtualScroll = ({ children, ...props }) => {
+const VirtualScroll = ({
+  Item,
+  items,
+  bench,
+  height,
+  itemHeight
+}) => {
   const [scrollTop, setScrollTop] = useState(0);
   const ref = useRef();
-  const HEIGHT_ITEM = (props.itemHeight || 50) + 2;
-  const HEIGHT_CONTAINER = props.height || 200;
-  const HIDEN_ITEMS = props.bench || 2;
-  const HEIGHT_ALL_ITEMS = Math.ceil(HEIGHT_ITEM * props.items.length);
+  const HEIGHT_ITEM = (itemHeight || 50) + 2;
+  const HEIGHT_CONTAINER = height || 200;
+  const HIDEN_ITEMS = bench || 2;
+  const HEIGHT_ALL_ITEMS = Math.ceil(HEIGHT_ITEM * items.length);
 
   // количество видимых элементов
   // высота контейнера / высота элемента + 2 пиксела бордюра + отступ + скртые элементы
@@ -31,8 +36,8 @@ const VirtualScroll = ({ children, ...props }) => {
   }, []);
 
   const visibleItems = useMemo(
-    () => props.items.slice(startNode, startNode + VISIBLE_ITEMS_COUNT),
-    [startNode, VISIBLE_ITEMS_COUNT, props]
+    () => items.slice(startNode, startNode + VISIBLE_ITEMS_COUNT),
+    [startNode, VISIBLE_ITEMS_COUNT, items]
   );
 
   return (

@@ -8,5 +8,4 @@ const Item = ({ name, id }) => {
     </div>
   );
 };
-
 export default Item;
