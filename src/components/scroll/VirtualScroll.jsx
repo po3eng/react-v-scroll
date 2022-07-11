@@ -1,70 +1,52 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import classes from "./VirtualScroll.module.css";
+import Item from "../Item/Item";
 
 const VirtualScroll = ({ children, ...props }) => {
-  const PADDING = 0;
-  const HEIGHT_ITEM = 50 + 2 + PADDING;
-  const HEIGHT_CONTAINER = 500;
-  const HIDEN_ITEMS = 4;
-  const HEIGHT_ALL_ITEMS = Math.ceilHEIGHT_ITEM * props.items.length;
+  const [scrollTop, setScrollTop] = useState(0);
+  const ref = useRef();
+  const HEIGHT_ITEM = (props.itemHeight || 50) + 2;
+  const HEIGHT_CONTAINER = props.height || 200;
+  const HIDEN_ITEMS = props.bench || 2;
+  const HEIGHT_ALL_ITEMS = Math.ceil(HEIGHT_ITEM * props.items.length);
 
   // количество видимых элементов
   // высота контейнера / высота элемента + 2 пиксела бордюра + отступ + скртые элементы
 
   const VISIBLE_ITEMS_COUNT =
     Math.floor(HEIGHT_CONTAINER / HEIGHT_ITEM) + HIDEN_ITEMS;
-  const ref = useRef();
-  let scrollTop = 0;
 
   let startNode = Math.floor(scrollTop / HEIGHT_ITEM);
-
-  
   let offsetY = startNode * HEIGHT_ITEM;
-  let visibleItems = [];
-  const eventScroll = (e) => {
-    scrollTop = e.target.scrollTop;
-    offsetY = startNode * HEIGHT_ITEM;
 
-
-    console.log("offsetY", offsetY);
-
-    startNode = Math.floor(scrollTop / HEIGHT_ITEM);
-    startNode = Math.max(0, startNode);
-
-    console.log("startNode>", startNode);
-
-
-    visibleItems = props.items.slice(
-      startNode,
-      startNode + VISIBLE_ITEMS_COUNT
-    );
-    console.log("visibleItems", visibleItems);
+  const onScroll = (e) => {
+    setScrollTop(e.target.scrollTop);
   };
 
-  //
-  // const [scrollTop, setScrollTop] = useState(0);
-  //  высота элемента + окантовка + отступ * кол-во элеметов
+  useEffect(() => {
+    const container = ref.current;
+    setScrollTop(container.scrollTop);
+    container.addEventListener("scroll", onScroll);
+    return () => container.removeEventListener("scroll", onScroll);
+  }, []);
 
-  console.log("heightAllItems", HEIGHT_ALL_ITEMS);
-  console.log(VISIBLE_ITEMS_COUNT);
+  const visibleItems = useMemo(
+    () => props.items.slice(startNode, startNode + VISIBLE_ITEMS_COUNT),
+    [startNode, VISIBLE_ITEMS_COUNT, props]
+  );
+
   return (
     <div
       className={classes.virtual_scroll}
-      style={{ HEIGHT_CONTAINER }}
-      onScroll={eventScroll}
+      style={{ height: `${HEIGHT_CONTAINER}px` }}
       ref={ref}
     >
-      <div
-        style={{
-          willChange: "transform",
-          transform: `translateY(${offsetY}px)`,
-        }}
-      >
-        {props.items.map((item, index) => (
-          <div className={classes.virtual_item} key={item.id}>
-            {item.name}
-          </div>
-        ))}
+      <div style={{ height: `${HEIGHT_ALL_ITEMS}px` }}>
+        <div style={{ transform: `translateY(${offsetY}px)` }}>
+          {visibleItems.map((item, index) => (
+            <Item name={item.name} id={item.id} key={item.id} />
+          ))}
+        </div>
       </div>
     </div>
   );
